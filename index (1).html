@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zack Tran — Human-Centered Design</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #f7f5f0; --surface: #ffffff; --text: #1a1916; --muted: #6b6860;
+      --faint: #b0ada6; --border: #e2dfd8; --accent: #2d5a3d;
+      --accent-light: #eaf2ec; --accent-text: #1e3d2a;
+      --serif: 'DM Serif Display', Georgia, serif;
+      --sans: 'DM Sans', system-ui, sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--sans); background: var(--bg); color: var(--text); font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+
+    .page { display: none; }
+    .page.active { display: block; animation: fadeIn 0.3s ease; }
+    @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(247,245,240,0.92); backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 48px; height: 60px;
+    }
+    .nav-logo { font-family: var(--serif); font-size: 20px; color: var(--text); text-decoration: none; cursor: pointer; background: none; border: none; font-family: var(--serif); }
+    .nav-links { display: flex; gap: 32px; align-items: center; }
+    .nav-links a { font-size: 14px; color: var(--muted); text-decoration: none; transition: color 0.15s; cursor: pointer; }
+    .nav-links a:hover { color: var(--text); }
+    .nav-cta { font-size: 13px !important; font-weight: 500; background: var(--text); color: var(--bg) !important; padding: 8px 16px; border-radius: 6px; }
+
+    .hero { padding: 100px 48px 80px; max-width: 1100px; margin: 0 auto; }
+    .hero-eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--accent-text); background: var(--accent-light); border: 1px solid #c5ddc9; padding: 5px 12px; border-radius: 100px; margin-bottom: 32px; }
+    .hero-eyebrow::before { content:''; width:6px; height:6px; border-radius:50%; background:var(--accent); }
+    .hero h1 { font-family: var(--serif); font-size: clamp(42px,6vw,72px); font-weight: 400; line-height: 1.1; letter-spacing: -0.02em; margin-bottom: 24px; max-width: 720px; }
+    .hero h1 em { font-style: italic; color: var(--muted); }
+    .hero-sub { font-size: 18px; color: var(--muted); max-width: 520px; line-height: 1.7; margin-bottom: 40px; font-weight: 300; }
+    .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+
+    .btn { display: inline-block; font-size: 14px; font-weight: 500; padding: 12px 24px; border-radius: 8px; text-decoration: none; transition: all 0.15s; cursor: pointer; border: none; font-family: var(--sans); }
+    .btn-dark { background: var(--text); color: var(--bg); border: 1px solid var(--text); }
+    .btn-dark:hover { opacity: 0.82; }
+    .btn-outline { background: transparent; color: var(--text); border: 1px solid var(--border); }
+    .btn-outline:hover { background: var(--surface); }
+    .btn-sm { font-size: 13px; padding: 9px 18px; }
+
+    .section-wrap { max-width: 1100px; margin: 0 auto; padding: 72px 48px; }
+    .section-wrap + .section-wrap { border-top: 1px solid var(--border); }
+    .section-label { font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--faint); margin-bottom: 40px; }
+
+    .projects-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .project-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s; text-decoration: none; color: var(--text); display: flex; flex-direction: column; }
+    .project-card:hover { transform: translateY(-3px); box-shadow: 0 12px 40px rgba(0,0,0,0.08); border-color: #c8c5be; }
+    .project-card.featured { grid-column: 1/-1; flex-direction: row; }
+    .card-visual { background: var(--bg); display: flex; align-items: center; justify-content: center; font-size: 56px; flex-shrink: 0; }
+    .card-visual.square { height: 220px; }
+    .card-visual.tall { width: 340px; min-height: 260px; }
+    .card-body { padding: 28px 30px 30px; display: flex; flex-direction: column; }
+    .card-meta { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+    .tag { font-size: 11px; font-weight: 500; letter-spacing: 0.04em; padding: 3px 9px; border-radius: 100px; background: var(--bg); color: var(--muted); border: 1px solid var(--border); }
+    .tag.green { background: var(--accent-light); color: var(--accent-text); border-color: #c5ddc9; }
+    .card-title { font-family: var(--serif); font-size: 22px; font-weight: 400; line-height: 1.25; margin-bottom: 12px; }
+    .card-desc { font-size: 14px; color: var(--muted); line-height: 1.7; flex: 1; }
+    .card-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border); }
+    .card-footer-label { font-size: 13px; color: var(--muted); }
+    .card-arrow { width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 14px; color: var(--text); transition: background 0.15s; }
+    .project-card:hover .card-arrow { background: var(--text); color: var(--bg); border-color: var(--text); }
+
+    .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: start; }
+    .about-text { font-size: 17px; color: var(--muted); line-height: 1.8; font-weight: 300; }
+    .about-text strong { color: var(--text); font-weight: 500; }
+    .about-text p + p { margin-top: 16px; }
+    .timeline { display: flex; flex-direction: column; }
+    .tl-row { display: grid; grid-template-columns: 88px 1fr; gap: 16px; padding: 18px 0; border-top: 1px solid var(--border); }
+    .tl-row:last-child { border-bottom: 1px solid var(--border); }
+    .tl-year { font-size: 12px; color: var(--faint); padding-top: 3px; }
+    .tl-place { font-size: 15px; font-weight: 500; margin-bottom: 3px; }
+    .tl-detail { font-size: 13px; color: var(--muted); line-height: 1.55; }
+
+    .skills-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; }
+    .skill-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 22px; }
+    .skill-icon { font-size: 22px; margin-bottom: 12px; }
+    .skill-name { font-size: 14px; font-weight: 500; margin-bottom: 5px; }
+    .skill-desc { font-size: 13px; color: var(--muted); line-height: 1.55; }
+
+    .contact-wrap { background: var(--text); border-radius: 20px; padding: 56px 60px; display: flex; align-items: center; justify-content: space-between; gap: 40px; }
+    .contact-wrap h2 { font-family: var(--serif); font-size: 36px; font-weight: 400; color: var(--bg); margin-bottom: 10px; letter-spacing: -0.02em; }
+    .contact-wrap p { font-size: 15px; color: #a09d96; max-width: 360px; line-height: 1.65; font-weight: 300; }
+    .contact-btns { display: flex; flex-direction: column; gap: 10px; min-width: 170px; }
+    .contact-btn { display: block; font-size: 13px; font-weight: 500; padding: 11px 20px; border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; color: var(--bg); text-decoration: none; text-align: center; transition: background 0.15s; }
+    .contact-btn:hover { background: rgba(255,255,255,0.08); }
+
+    footer { border-top: 1px solid var(--border); padding: 24px 48px; max-width: 1100px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+    footer span { font-size: 13px; color: var(--faint); }
+
+    /* PROJECT DETAIL */
+    .project-page { max-width: 860px; margin: 0 auto; padding: 56px 48px 80px; }
+    .back-btn { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; color: var(--muted); cursor: pointer; margin-bottom: 40px; transition: color 0.15s; background: none; border: none; font-family: var(--sans); padding: 0; }
+    .back-btn:hover { color: var(--text); }
+    .project-page h1 { font-family: var(--serif); font-size: clamp(32px,5vw,52px); font-weight: 400; line-height: 1.12; letter-spacing: -0.02em; margin-bottom: 20px; }
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 20px 0 40px; }
+    .info-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 18px 20px; }
+    .info-card-label { font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--faint); margin-bottom: 5px; }
+    .info-card-value { font-size: 15px; font-weight: 500; }
+    .project-section { margin-bottom: 48px; }
+    .project-section h2 { font-family: var(--serif); font-size: 26px; font-weight: 400; margin-bottom: 16px; }
+    .project-section p { font-size: 16px; color: var(--muted); line-height: 1.8; margin-bottom: 14px; font-weight: 300; }
+    .project-section p strong { color: var(--text); font-weight: 500; }
+    .project-section ul { list-style: none; padding: 0; margin: 16px 0; }
+    .project-section ul li { font-size: 15px; color: var(--muted); line-height: 1.7; padding: 12px 0; border-bottom: 1px solid var(--border); display: flex; gap: 12px; }
+    .project-section ul li:first-child { border-top: 1px solid var(--border); }
+    .project-section ul li::before { content:'→'; color: var(--accent); flex-shrink: 0; }
+    .project-img { width: 100%; border-radius: 12px; margin: 8px 0 28px; border: 1px solid var(--border); object-fit: cover; display: block; }
+    .phase-block { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 22px 24px; margin-bottom: 14px; }
+    .phase-label { font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent-text); background: var(--accent-light); border: 1px solid #c5ddc9; padding: 3px 10px; border-radius: 100px; display: inline-block; margin-bottom: 10px; }
+    .phase-title { font-size: 15px; font-weight: 500; margin-bottom: 8px; }
+    .phase-desc { font-size: 14px; color: var(--muted); line-height: 1.7; }
+    .divider { border: none; border-top: 1px solid var(--border); margin: 48px 0; }
+    .cta-inline { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 32px 36px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+    .cta-inline h3 { font-family: var(--serif); font-size: 22px; font-weight: 400; margin-bottom: 6px; }
+    .cta-inline p { font-size: 14px; color: var(--muted); }
+
+    @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+    .hero > * { animation: fadeUp 0.6s ease both; }
+    .hero > *:nth-child(1) { animation-delay:0.05s; }
+    .hero > *:nth-child(2) { animation-delay:0.15s; }
+    .hero > *:nth-child(3) { animation-delay:0.25s; }
+    .hero > *:nth-child(4) { animation-delay:0.35s; }
+
+    @media (max-width: 768px) {
+      nav { padding: 0 20px; }
+      .nav-links a:not(.nav-cta) { display: none; }
+      .hero, .section-wrap { padding-left: 20px; padding-right: 20px; }
+      .hero { padding-top: 64px; padding-bottom: 56px; }
+      .projects-grid { grid-template-columns: 1fr; }
+      .project-card.featured { flex-direction: column; }
+      .card-visual.tall { width: 100%; height: 200px; }
+      .about-grid, .two-col { grid-template-columns: 1fr; }
+      .skills-grid { grid-template-columns: 1fr 1fr; }
+      .contact-wrap { flex-direction: column; padding: 40px 28px; }
+      footer { flex-direction: column; gap: 8px; padding: 24px 20px; }
+      .project-page { padding: 40px 20px 64px; }
+      .cta-inline { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <button class="nav-logo" onclick="showPage('home')">Zack Tran</button>
+  <div class="nav-links">
+    <a onclick="goHome('work')">Work</a>
+    <a onclick="goHome('about')">About</a>
+    <a onclick="goHome('contact')" class="nav-cta">Say hello →</a>
+  </div>
+</nav>
+
+<!-- ══════════ HOME ══════════ -->
+<div id="page-home" class="page active">
+  <div class="hero">
+    <div class="hero-eyebrow">Open to opportunities · Dearborn, MI</div>
+    <h1>Design-focused student<br>who solves <em>with empathy.</em></h1>
+    <p class="hero-sub">Human-Centered Engineering Design student at UMich–Dearborn. I build experiences that connect emotionally — driven by curiosity, collaboration, and a process-first mindset.</p>
+    <div class="hero-actions">
+      <button class="btn btn-dark" onclick="scrollTo('work')">View my work</button>
+      <button class="btn btn-outline" onclick="scrollTo('contact')">Get in touch →</button>
+    </div>
+  </div>
+
+  <div class="section-wrap" id="work">
+    <div class="section-label">Selected work</div>
+    <div class="projects-grid">
+
+      <div class="project-card featured" onclick="showPage('rover')">
+        <div class="card-visual tall" style="background:#eef4ef;">🚗</div>
+        <div class="card-body">
+          <div class="card-meta"><span class="tag green">Engineering Design</span><span class="tag">2024</span></div>
+          <div class="card-title">E100 Rover Project</div>
+          <div class="card-desc">Led a student team to design and build a functional electric rover — including CAD wheel design, Arduino programming for terrain navigation, and full project management across milestones.</div>
+          <div class="card-footer"><span class="card-footer-label">Project Manager · CAD · Arduino</span><span class="card-arrow">↗</span></div>
+        </div>
+      </div>
+
+      <div class="project-card" onclick="showPage('senior')">
+        <div class="card-visual square" style="background:#f0f4f8;">🧍</div>
+        <div class="card-body">
+          <div class="card-meta"><span class="tag green">Senior Capstone</span><span class="tag">UX Research</span></div>
+          <div class="card-title">Reducing Fall Risks for Older Adults</div>
+          <div class="card-desc">Ergonomic load-transfer research addressing fall prevention in aging populations — bridging the gap between a walker and a household cart.</div>
+          <div class="card-footer"><span class="card-footer-label">Ergonomics · Health Design</span><span class="card-arrow">↗</span></div>
+        </div>
+      </div>
+
+      <div class="project-card" onclick="showPage('mood')">
+        <div class="card-visual square" style="background:#f4f0f8;">🧠</div>
+        <div class="card-body">
+          <div class="card-meta"><span class="tag green">Arduino Prototype</span><span class="tag">Wearable</span></div>
+          <div class="card-title">Mood Minder Prototype</div>
+          <div class="card-desc">A wearable Arduino device combining activity tracking and emotion detection — GPS, RTC, accelerometer — to support personalized wellbeing feedback.</div>
+          <div class="card-footer"><span class="card-footer-label">Hardware · UX · Wellness</span><span class="card-arrow">↗</span></div>
+        </div>
+      </div>
+
+      <div class="project-card featured" onclick="showPage('pill')" style="flex-direction:row-reverse;">
+        <div class="card-visual tall" style="background:#f0f8f4;">💊</div>
+        <div class="card-body">
+          <div class="card-meta"><span class="tag green">Health UX</span><span class="tag">HCED 450</span><span class="tag">3D Design</span></div>
+          <div class="card-title">Pill Pro Dispenser</div>
+          <div class="card-desc">A 3D-designed medication dispenser prototype built to eliminate hospital dispensing errors — ensuring the right drug, dose, and patient, every time.</div>
+          <div class="card-footer"><span class="card-footer-label">3D Design · Healthcare · Team Project</span><span class="card-arrow">↗</span></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="section-wrap" id="about">
+    <div class="section-label">About me</div>
+    <div class="about-grid">
+      <div class="about-text">
+        <p>I'm Zack — a <strong>Human-Centered Engineering Design</strong> student at UMich–Dearborn with a passion for designing products that feel right to the people who use them.</p>
+        <p>I grew up in Ho Chi Minh City, Vietnam, moved to Michigan during high school, and volunteered with <strong>Loaves &amp; Fishes</strong> in Taylor before starting university. Those experiences shaped how I see design — not as aesthetics, but as care made tangible.</p>
+        <p>My process is rooted in <strong>empathy, curiosity, and honest iteration</strong>. I care about the real person on the other side of every interface, product, or system I work on.</p>
+      </div>
+      <div class="timeline">
+        <div class="tl-row"><div class="tl-year">2003–2018</div><div><div class="tl-place">Ho Chi Minh City, Vietnam</div><div class="tl-detail">Born and raised. Developed a love for making things.</div></div></div>
+        <div class="tl-row"><div class="tl-year">2018–2019</div><div><div class="tl-place">Rockford, Michigan</div><div class="tl-detail">Sophomore year at Rockford High School.</div></div></div>
+        <div class="tl-row"><div class="tl-year">2019–2021</div><div><div class="tl-place">Allen Park, Michigan</div><div class="tl-detail">Graduated Cabrini High School · Volunteered at Loaves &amp; Fishes, Taylor.</div></div></div>
+        <div class="tl-row"><div class="tl-year">2021–2025</div><div><div class="tl-place">University of Michigan–Dearborn</div><div class="tl-detail">BS in Human-Centered Engineering Design. Expected graduation 2025.</div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-wrap">
+    <div class="section-label">Skills &amp; methods</div>
+    <div class="skills-grid">
+      <div class="skill-card"><div class="skill-icon">🔍</div><div class="skill-name">UX Research</div><div class="skill-desc">User interviews, usability testing, affinity mapping, journey mapping</div></div>
+      <div class="skill-card"><div class="skill-icon">✏️</div><div class="skill-name">Prototyping</div><div class="skill-desc">Figma, wireframing, low- and high-fidelity mockups, rapid iteration</div></div>
+      <div class="skill-card"><div class="skill-icon">♿</div><div class="skill-name">Accessibility</div><div class="skill-desc">Inclusive design principles, WCAG guidelines, designing for diverse users</div></div>
+      <div class="skill-card"><div class="skill-icon">🔧</div><div class="skill-name">Engineering Design</div><div class="skill-desc">CAD, Arduino, systems thinking, mechanical prototyping</div></div>
+      <div class="skill-card"><div class="skill-icon">🤝</div><div class="skill-name">Collaboration</div><div class="skill-desc">Cross-functional teamwork, stakeholder communication, design critique</div></div>
+      <div class="skill-card"><div class="skill-icon">🌱</div><div class="skill-name">Empathy-led Design</div><div class="skill-desc">Human-centered process, emotional design, context-aware solutions</div></div>
+    </div>
+  </div>
+
+  <div class="section-wrap" id="contact">
+    <div class="contact-wrap">
+      <div>
+        <h2>Want to connect?</h2>
+        <p>I'm open to internships, design collaborations, and conversations about human-centered work. Reach out anytime.</p>
+      </div>
+      <div class="contact-btns">
+        <a class="contact-btn" href="mailto:zacktran@umich.edu">Email me ↗</a>
+        <a class="contact-btn" href="https://www.linkedin.com/in/truc-zack-tran-03b777146/" target="_blank" rel="noopener">LinkedIn ↗</a>
+        <a class="contact-btn" href="https://www.instagram.com/bobamochi2620/" target="_blank" rel="noopener">Instagram ↗</a>
+        <a class="contact-btn" href="https://cdn.prod.website-files.com/63529fbbef305a20fade3097/643d4e346d8d200b5737f950_Zack%20Resume%20(4)_Page_1.png" target="_blank" rel="noopener">Resume ↗</a>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <span>© 2025 Zack Tran</span>
+    <span>Human-Centered Engineering Design · UMich–Dearborn</span>
+  </footer>
+</div>
+
+
+<!-- ══════════ PROJECT: ROVER ══════════ -->
+<div id="page-rover" class="page">
+  <div class="project-page">
+    <button class="back-btn" onclick="showPage('home')">← Back to work</button>
+    <div class="card-meta" style="margin-bottom:16px;"><span class="tag green">Engineering Design</span><span class="tag">Project Manager</span><span class="tag">2024</span></div>
+    <h1>E100 Rover Project</h1>
+
+    <div class="two-col">
+      <div class="info-card"><div class="info-card-label">Role</div><div class="info-card-value">Project Manager &amp; CAD Designer</div></div>
+      <div class="info-card"><div class="info-card-label">Team</div><div class="info-card-value">Team 5</div></div>
+      <div class="info-card"><div class="info-card-label">Duration</div><div class="info-card-value">Apr 2014 – Mar 2015</div></div>
+      <div class="info-card"><div class="info-card-label">Tools</div><div class="info-card-value">CAD · Arduino · 3D Printing</div></div>
+    </div>
+
+    <div class="project-section">
+      <h2>Project Overview</h2>
+      <p>The E100 Rover project tasked our team with designing a functional wheel system for a rover chassis and developing Arduino code capable of navigating across varied challenge terrain. The project simulated real engineering constraints — balancing weight, durability, terrain adaptability, and control system reliability.</p>
+      <img class="project-img" src="https://cdn.prod.website-files.com/63529fbbef305a20fade3097/635c06432b75b31cd6ee3630_Rover%20e100.png" alt="E100 Rover" onerror="this.style.display='none'" />
+    </div>
+
+    <div class="project-section">
+      <h2>My Contributions</h2>
+      <ul>
+        <li>Served as Project Leader — coordinating tasks, timelines, and team deliverables</li>
+        <li>Scheduled and assigned work to each team member based on skills and capacity</li>
+        <li>Facilitated regular meetings including Zoom calls, calendar management, and progress check-ins</li>
+        <li>Designed the liquid holder component as a 3D CAD model</li>
+        <li>Designed the rover wheel for the chassis as a 3D CAD model</li>
+        <li>Contributed to Arduino programming logic for terrain navigation challenges</li>
+      </ul>
+    </div>
+
+    <div class="project-section">
+      <h2>Design Context: Wheel Engineering</h2>
+      <p>Designing wheels for a rover operating on rough terrain requires a deep understanding of the physical demands of the environment. The wheels must traverse rocky and sandy surfaces, handle inclines of various angles, and resist wear from abrasive contact.</p>
+      <p><strong>Material selection</strong> was a key decision point — the wheels needed to be made from high-strength alloys or reinforced composites to withstand constant abrasion without rapid degradation.</p>
+      <p><strong>Weight optimization</strong> was equally important: lighter wheels improve rover agility and energy efficiency, so we minimized mass while maintaining structural integrity under load.</p>
+      <p>The final design used a <strong>segmented wheel construction</strong> connected via a suspension system, allowing each wheel to move independently. This dramatically improved balance across uneven terrain. A wide, low-pressure tire profile distributed load evenly and prevented sinking on soft surfaces.</p>
+    </div>
+
+    <hr class="divider" />
+    <div class="cta-inline">
+      <div><h3>Want to discuss this project?</h3><p>Reach out at zacktran@umich.edu</p></div>
+      <a class="btn btn-dark btn-sm" href="mailto:zacktran@umich.edu">Get in touch →</a>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════ PROJECT: SENIOR / FALL RISK ══════════ -->
+<div id="page-senior" class="page">
+  <div class="project-page">
+    <button class="back-btn" onclick="showPage('home')">← Back to work</button>
+    <div class="card-meta" style="margin-bottom:16px;"><span class="tag green">Senior Capstone</span><span class="tag">HCED 4951/2</span><span class="tag">In Progress</span></div>
+    <h1>Case Study: Senior Mobility &amp; Fall Prevention</h1>
+
+    <div class="two-col">
+      <div class="info-card"><div class="info-card-label">Role</div><div class="info-card-value">User Researcher &amp; Product Designer</div></div>
+      <div class="info-card"><div class="info-card-label">Context</div><div class="info-card-value">Senior Design Capstone, UMich–Dearborn</div></div>
+      <div class="info-card"><div class="info-card-label">Deadline</div><div class="info-card-value">December 10th</div></div>
+      <div class="info-card"><div class="info-card-label">Status</div><div class="info-card-value">Research Phase — In Progress</div></div>
+    </div>
+
+    <div class="project-section">
+      <h2>The Problem</h2>
+      <p><strong>The conflict: daily living vs. physical decline.</strong> Older adults frequently need to move items between rooms — groceries, laundry, cleaning supplies. But aging naturally reduces balance, posture control, and strength.</p>
+      <p>When an older adult carries even a light load, it shifts their center of gravity and reduces stability. This creates a dangerous trade-off: to maintain an independent household, they must perform tasks that significantly increase their risk of falling.</p>
+      <img class="project-img" src="https://cdn.prod.website-files.com/63529fbbef305a20fade3097/6939c96dd7793c2c73b4aadf_Design-Empathy.jpg" alt="Design Empathy research" onerror="this.style.display='none'" />
+    </div>
+
+    <div class="project-section">
+      <h2>Core Design Challenge</h2>
+      <p>How might we eliminate the need for manual carrying inside the home — reducing physical strain and preventing falls while preserving independence?</p>
+      <p>Our goal is to design a <strong>low-effort ergonomic solution</strong> for safe, efficient indoor load transfer that doesn't require the user to bear weight manually. The solution must bridge the gap between a medical device (walker) and a household tool (cart) — fitting naturally into daily life without stigma.</p>
+      <img class="project-img" src="https://cdn.prod.website-files.com/63529fbbef305a20fade3097/6939c9ea3633f6181e140138_lifting-mechanics.png" alt="Lifting mechanics analysis" onerror="this.style.display='none'" />
+    </div>
+
+    <div class="project-section">
+      <h2>Research &amp; Upcoming Milestones</h2>
+      <div class="phase-block">
+        <div class="phase-label">Phase 1</div>
+        <div class="phase-title">Pathway Mapping</div>
+        <div class="phase-desc">Create visual diagrams of common in-home load movement pathways — identifying which routes and tasks most frequently lead to fall risk scenarios for older adults.</div>
+      </div>
+      <div class="phase-block">
+        <div class="phase-label">Phase 2</div>
+        <div class="phase-title">Posture Analysis</div>
+        <div class="phase-desc">Analyze physical effort during load-carrying tasks to identify specific points of strain, imbalance, and fall risk. Informed by biomechanics literature and direct user observation.</div>
+      </div>
+      <div class="phase-block">
+        <div class="phase-label">Phase 3</div>
+        <div class="phase-title">Concept Prototyping</div>
+        <div class="phase-desc">Develop and test concepts that sit between a walker and a household cart — designed to be used without stigma, fitting naturally into everyday home environments.</div>
+      </div>
+    </div>
+
+    <hr class="divider" />
+    <div class="cta-inline">
+      <div><h3>Interested in this research?</h3><p>This project is actively in progress — happy to share more.</p></div>
+      <a class="btn btn-dark btn-sm" href="mailto:zacktran@umich.edu">Get in touch →</a>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════ PROJECT: MOOD MINDER ══════════ -->
+<div id="page-mood" class="page">
+  <div class="project-page">
+    <button class="back-btn" onclick="showPage('home')">← Back to work</button>
+    <div class="card-meta" style="margin-bottom:16px;"><span class="tag green">Arduino Prototype</span><span class="tag">Wearable Device</span><span class="tag">Wellness</span></div>
+    <h1>Mood Minder Prototype</h1>
+
+    <div class="two-col">
+      <div class="info-card"><div class="info-card-label">Type</div><div class="info-card-value">Wearable Hardware Prototype</div></div>
+      <div class="info-card"><div class="info-card-label">Platform</div><div class="info-card-value">Arduino + Accelerometer</div></div>
+      <div class="info-card"><div class="info-card-label">Modules</div><div class="info-card-value">GPS · RTC · Activity Tracking</div></div>
+      <div class="info-card"><div class="info-card-label">Status</div><div class="info-card-value">Functional Prototype Delivered</div></div>
+    </div>
+
+    <div class="project-section">
+      <h2>Project Overview</h2>
+      <p>The Mood Minder is a wearable device that combines activity tracking with emotion detection to provide personalized feedback for improved wellbeing. The goal was to develop a functional prototype that gave users a low-friction way to log their mood and physical activity throughout the day — and surface patterns over time.</p>
+      <img class="project-img" src="https://cdn.prod.website-files.com/63529fbbef305a20fade3097/6625429b26ce718685d6dd57_437570329_3144303449037136_1030849173696725821_n.jpg" alt="Mood Minder wearable device" onerror="this.style.display='none'" />
+    </div>
+
+    <div class="project-section">
+      <h2>Core Features</h2>
+      <ul>
+        <li>Basic activity tracking — steps and distance — using an accelerometer sensor</li>
+        <li>Button interface for users to self-report key activities: eating, drinking, high stress, low stress</li>
+        <li>Real-time data synchronization using integrated GPS and RTC modules</li>
+        <li>Modular hardware design allowing component upgrades without full redesign</li>
+      </ul>
+    </div>
+
+    <div class="project-section">
+      <h2>Development Phases</h2>
+      <div class="phase-block">
+        <div class="phase-label">Phase 1</div>
+        <div class="phase-title">Design &amp; Planning</div>
+        <div class="phase-desc">Conducted user research to refine the Mood Minder concept based on target audience needs. Developed detailed design specifications for hardware and software. Identified components and created a project timeline with milestones.</div>
+      </div>
+      <img class="project-img" src="https://cdn.prod.website-files.com/63529fbbef305a20fade3097/6625449e3ada9da7e552f043_Picture3.png" alt="Phase 1 planning diagram" onerror="this.style.display='none'" />
+      <div class="phase-block">
+        <div class="phase-label">Phase 2</div>
+        <div class="phase-title">Prototype Development — 4 weeks</div>
+        <div class="phase-desc">Acquired hardware components including accelerometer, button interface, and microcontroller. Developed core activity tracking and user input functionalities directly on the microcontroller.</div>
+      </div>
+      <div class="phase-block">
+        <div class="phase-label">Phase 3</div>
+        <div class="phase-title">Testing &amp; Refinement — 2 weeks</div>
+        <div class="phase-desc">Conducted internal testing to assess prototype functionality. Gathered user feedback through usability testing to identify pain points. Refined hardware and software based on testing results before final delivery.</div>
+      </div>
+      <img class="project-img" src="https://cdn.prod.website-files.com/63529fbbef305a20fade3097/6765deb33204108ffb25cdab_1330ad7f-e694-4989-9a36-01173cbb2a14.jpg" alt="Final prototype assembly" onerror="this.style.display='none'" />
+      <img class="project-img" src="https://cdn.prod.website-files.com/63529fbbef305a20fade3097/6765dfcca832baf106a88b6f_cafb8f5a-083e-4007-82c4-6008927329ca.jpg" alt="Prototype detail view" onerror="this.style.display='none'" />
+    </div>
+
+    <div class="project-section">
+      <h2>Final Outcome</h2>
+      <p>The final prototype successfully integrates GPS and RTC modules with a physical user interface, demonstrating <strong>real-time data synchronization</strong> and a <strong>modular architecture</strong> designed to be extended with additional sensors or software features in future iterations.</p>
+    </div>
+
+    <hr class="divider" />
+    <div class="cta-inline">
+      <div><h3>Want to learn more?</h3><p>Reach out at zacktran@umich.edu</p></div>
+      <a class="btn btn-dark btn-sm" href="mailto:zacktran@umich.edu">Get in touch →</a>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════ PROJECT: PILL PRO ══════════ -->
+<div id="page-pill" class="page">
+  <div class="project-page">
+    <button class="back-btn" onclick="showPage('home')">← Back to work</button>
+    <div class="card-meta" style="margin-bottom:16px;"><span class="tag green">HCED 450</span><span class="tag">3D Design</span><span class="tag">Healthcare</span></div>
+    <h1>Pill Pro Dispenser</h1>
+
+    <div class="two-col">
+      <div class="info-card"><div class="info-card-label">Course</div><div class="info-card-value">HCED 450 Final Project</div></div>
+      <div class="info-card"><div class="info-card-label">Team</div><div class="info-card-value">Jawad Alfandi, Zack Tran, Savannah Welch</div></div>
+      <div class="info-card"><div class="info-card-label">Output</div><div class="info-card-value">3D-Designed Physical Prototype</div></div>
+      <div class="info-card"><div class="info-card-label">Domain</div><div class="info-card-value">Hospital Medication Safety</div></div>
+    </div>
+
+    <div class="project-section">
+      <h2>Problem Statement</h2>
+      <p>Hospitals face critical challenges in ensuring medication dispensing accuracy — a cornerstone of patient safety and operational efficiency. Current manual processes are prone to human error and are complicated by the need to manage multiple medications for many patients simultaneously.</p>
+      <p>These inefficiencies don't just create safety risks — they place significant <strong>emotional and physical stress</strong> on healthcare professionals who must catch errors under high pressure and time constraints.</p>
+      <img class="project-img" src="https://cdn.prod.website-files.com/63529fbbef305a20fade3097/67a509a98d36f2ead828ac3f_IMG_7890.jpg" alt="Pill Pro dispenser prototype" onerror="this.style.display='none'" />
+    </div>
+
+    <div class="project-section">
+      <h2>Goals &amp; Pain Points</h2>
+      <p>Hospitals need a system that <strong>ensures dispensing accuracy and prevents errors</strong> while remaining efficient and low-friction — reducing the time healthcare professionals spend on manual verification tasks.</p>
+      <ul>
+        <li>High risk of human error in multi-medication, multi-patient workflows</li>
+        <li>Complexity of tracking doses and timing across different prescriptions</li>
+        <li>Emotional and physical toll of managing potential adverse outcomes from dispensing mistakes</li>
+        <li>Lack of intuitive verification steps built into the current dispensing flow</li>
+      </ul>
+    </div>
+
+    <div class="project-section">
+      <h2>Design Objective</h2>
+      <p>Our core mandate: deliver the <strong>correct medication</strong> to the <strong>correct patient</strong> in the <strong>correct dose</strong> at the <strong>correct time</strong> — with minimal cognitive load on the healthcare provider.</p>
+      <img class="project-img" src="https://cdn.prod.website-files.com/63529fbbef305a20fade3097/67a92d82ff01f88d5ddb6669_IMG_7891.jpg" alt="Pill Pro detail view" onerror="this.style.display='none'" />
+    </div>
+
+    <div class="project-section">
+      <h2>Our Approach</h2>
+      <div class="phase-block">
+        <div class="phase-label">Research</div>
+        <div class="phase-title">Understanding the Workflow</div>
+        <div class="phase-desc">Mapped existing hospital medication dispensing workflows to identify critical error points. Reviewed human factors literature on healthcare UI design, fatigue-related mistakes, and verification behavior under pressure.</div>
+      </div>
+      <div class="phase-block">
+        <div class="phase-label">Design</div>
+        <div class="phase-title">3D Prototype Development</div>
+        <div class="phase-desc">Created a 3D-designed physical dispenser with compartmentalized medication storage, a clear verification interface, and a layout that reduces reaching, confusion, and cognitive load during high-pressure moments on the ward.</div>
+      </div>
+      <div class="phase-block">
+        <div class="phase-label">Outcome</div>
+        <div class="phase-title">Final Prototype</div>
+        <div class="phase-desc">A tangible, functional prototype demonstrating how physical design can reduce cognitive load and error risk in medication dispensing. Presented as the HCED 450 course final by the full team.</div>
+      </div>
+    </div>
+
+    <hr class="divider" />
+    <div class="cta-inline">
+      <div><h3>Want to see the full prototype?</h3><p>Reach out at zacktran@umich.edu</p></div>
+      <a class="btn btn-dark btn-sm" href="mailto:zacktran@umich.edu">Get in touch →</a>
+    </div>
+  </div>
+</div>
+
+
+<script>
+  function showPage(id) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    const el = document.getElementById('page-' + id);
+    if (el) { el.classList.add('active'); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+  }
+
+  function scrollTo(id) {
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function goHome(section) {
+    showPage('home');
+    setTimeout(() => scrollTo(section), 80);
+  }
+</script>
+</body>
+</html>
